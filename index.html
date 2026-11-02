@@ -2,21 +2,90 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>두근두근 자리 뽑기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎲 2학기 자리 뽑기</title>
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; text-align: center; background-color: #f0f2f5; margin-top: 50px; }
-        .card-container { position: relative; width: 300px; height: 200px; margin: 20px auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; color: #007bff; }
-        canvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
-        .info { margin-bottom: 20px; color: #666; font-size: 1.1rem; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            letter-spacing: -1px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            color: #606f7b;
+            margin: 0;
+        }
+
+        .card-container {
+            position: relative;
+            width: 360px;
+            height: 220px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 내부에 위치한 당첨 번호 레이아웃 */
+        .seat-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .seat-label {
+            font-size: 1rem;
+            color: #8898aa;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .seat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #4f46e5;
+            letter-spacing: -2px;
+            text-shadow: 0 2px 10px rgba(79, 70, 229, 0.2);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: none; /* 태블릿 스크롤 방지 */
+        }
     </style>
     
     <!-- 최신 파이어베이스 SDK (Modular 방식) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 본인의 파이어베이스 설정 정보
         const firebaseConfig = {
             apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
             authDomain: "novemberseat.firebaseapp.com",
@@ -34,14 +103,34 @@
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
 
-        // 스크래치 커버 그리기 (은색)
-        ctx.fillStyle = '#c0c0c0';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#555';
-        ctx.font = '18px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('여기를 긁어서 번호 확인!', canvas.width / 2, canvas.height / 2 + 6);
-        ctx.globalCompositeOperation = 'destination-out';
+        // 스크래치 커버 디자인 (입체적인 은색 그래디언트 + 안내 문구)
+        function drawScratchCover() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // 배경 은색 그래디언트
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#e0e0e0');
+            gradient.addColorStop(0.5, '#b8b8b8');
+            gradient.addColorStop(1, '#9e9e9e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // 섬세한 노이즈 텍스처 효과 추가
+            for (let i = 0; i < 500; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+                ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+            }
+
+            // 안내 문구 설정
+            ctx.fillStyle = '#424242';
+            ctx.font = 'bold 20px Pretendard, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✨ 손으로 긁어보세요 ✨', width / 2, height / 2);
+        }
+
+        drawScratchCover();
 
         async function getMySeat() {
             let mySeat = localStorage.getItem('my_seat_number');
@@ -59,7 +148,7 @@
                         throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
                     }
 
-                    let available = docSnap.data().available; // 남은 번호 배열
+                    let available = docSnap.data().available;
                     if (available.length === 0) throw "모든 번호가 배정되었습니다!";
 
                     const randomIndex = Math.floor(Math.random() * available.length);
@@ -77,35 +166,72 @@
 
         getMySeat();
 
-        // 스크래치 인터랙션 구현
+        // 부드러운 스크래치 인터랙션 (태블릿 터치 및 마우스 대응)
         let isDrawing = false;
-        function scratch(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+        let lastPos = { x: 0, y: 0 };
 
-            ctx.beginPath();
-            ctx.arc(x, y, 25, 0, Math.PI * 2);
-            ctx.fill();
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
         }
 
-        canvas.addEventListener('mousedown', () => isDrawing = true);
+        function startScratch(e) {
+            isDrawing = true;
+            lastPos = getPos(e);
+            scratch(e);
+        }
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+
+            const currentPos = getPos(e);
+
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = 45; // 지우개 크기 (태블릿에 적합한 두께)
+            ctx.lineCap = 'round'; // 붓 끝을 둥글게하여 끊김 완화
+            ctx.lineJoin = 'round'; // 선 연결부를 둥글게
+
+            ctx.beginPath();
+            ctx.moveTo(lastPos.x, lastPos.y);
+            ctx.lineTo(currentPos.x, currentPos.y);
+            ctx.stroke();
+
+            lastPos = currentPos;
+        }
+
+        function stopScratch() {
+            isDrawing = false;
+        }
+
+        // 터치 및 마우스 이벤트 리스너
+        canvas.addEventListener('mousedown', startScratch);
         canvas.addEventListener('mousemove', scratch);
-        window.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('touchstart', () => isDrawing = true);
-        canvas.addEventListener('touchmove', scratch);
-        window.addEventListener('touchend', () => isDrawing = false);
+        window.addEventListener('mouseup', stopScratch);
+
+        canvas.addEventListener('touchstart', startScratch, { passive: false });
+        canvas.addEventListener('touchmove', scratch, { passive: false });
+        window.addEventListener('touchend', stopScratch);
     </script>
 </head>
 <body>
 
-    <h2>🎲 11월 자리 뽑기</h2>
-    <p class="info">화면을 손가락으로 긁어서 내 번호를 확인하세요!</p>
+    <div class="header">
+        <h1>🎲 2학기 모둠 자리 뽑기</h1>
+        <p>카드를 문질러서 지정 자리를 확인하세요!</p>
+    </div>
 
     <div class="card-container">
-        <span id="seat-number">--번</span>
-        <canvas id="scratchPad" width="300" height="200"></canvas>
+        <div class="seat-content">
+            <div class="seat-label">MY SEAT</div>
+            <div class="seat-number" id="seat-number">--번</div>
+        </div>
+        <canvas id="scratchPad" width="360" height="220"></canvas>
     </div>
 
 </body>
