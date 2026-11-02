@@ -18,7 +18,7 @@
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             min-height: 100vh;
             margin: 0;
-            padding: 20px 15px;
+            padding: 30px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -28,10 +28,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
-            position: relative;
-            width: 100%;
-            max-width: 650px;
+            margin-bottom: 20px;
         }
         .header h1 {
             font-family: 'Paperlogy-5Medium', sans-serif;
@@ -43,23 +40,8 @@
         .header p {
             font-size: 1rem;
             color: #37474f;
-            margin: 0 0 10px 0;
+            margin: 0;
         }
-
-        /* 결과 확인 탭 버튼 */
-        .toggle-btn {
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
-            transition: all 0.2s ease;
-        }
-        .toggle-btn:hover { background-color: #1565c0; transform: translateY(-1px); }
 
         /* 카드 상자 */
         .card-container {
@@ -74,7 +56,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             border: 2px solid #bbdefb;
         }
 
@@ -130,18 +112,20 @@
             font-weight: bold;
             padding: 8px 0;
             border-radius: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-size: 0.95rem;
             letter-spacing: 2px;
         }
 
+        /* 3개 분단 배치 */
         .seating-chart {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             width: 100%;
         }
 
+        /* 분단 개별 스타일 (2열 5행) */
         .block {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -150,41 +134,28 @@
             background: #90caf9;
             gap: 2px;
             flex: 1;
-            max-width: 180px;
+            max-width: 170px;
         }
 
         .seat-cell {
             background: #ffffff;
-            height: 55px;
+            height: 52px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #37474f;
             transition: all 0.3s ease;
-            padding: 2px;
         }
 
-        .seat-cell .student-name {
-            font-size: 0.75rem;
-            color: #1976d2;
-            font-weight: 700;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
+        /* 내 자리 하이라이트 애니메이션 */
         .seat-cell.my-seat {
             background-color: #1976d2 !important;
             color: #ffffff !important;
+            font-size: 1.4rem;
+            font-weight: 800;
             animation: pulse 1.5s infinite alternate;
-        }
-        .seat-cell.my-seat .student-name {
-            color: #ffffff !important;
         }
 
         @keyframes pulse {
@@ -192,63 +163,15 @@
             100% { transform: scale(0.95); box-shadow: inset 0 0 0 4px #90caf9; }
         }
 
-        /* 이름 입력 팝업 모달 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-box {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 350px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(21, 101, 192, 0.15);
-            border: 2px solid #bbdefb;
-        }
-        .modal-box h3 { margin: 0 0 10px 0; color: #1565c0; font-size: 1.3rem; }
-        .modal-box p { margin: 0 0 20px 0; color: #546e7a; font-size: 0.9rem; }
-        .modal-box input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #90caf9;
-            border-radius: 10px;
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            margin-bottom: 20px;
-        }
-        .modal-box input:focus { border-color: #1976d2; }
-        .modal-box button {
-            width: 100%;
-            padding: 12px;
-            background: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .modal-box button:hover { background: #1565c0; }
-
         @media (max-width: 500px) {
-            .seating-chart { gap: 6px; }
-            .seat-cell { height: 48px; font-size: 0.9rem; }
-            .seat-cell .student-name { font-size: 0.68rem; }
+            .seating-chart { gap: 8px; }
+            .seat-cell { height: 42px; font-size: 0.95rem; }
         }
     </style>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
@@ -266,16 +189,11 @@
         const seatNumberSpan = document.getElementById('seat-number');
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
-        const nameModal = document.getElementById('nameModal');
-        const nameInput = document.getElementById('studentNameInput');
-        const confirmNameBtn = document.getElementById('confirmNameBtn');
-        const toggleResultBtn = document.getElementById('toggleResultBtn');
 
         let assignedSeat = null;
-        let studentName = "";
         let isRevealed = false;
-        let showAllResultMode = false;
 
+        // 스크래치 커버 그리기 (연한 파란색 계열)
         function drawScratchCover() {
             const width = canvas.width;
             const height = canvas.height;
@@ -301,6 +219,7 @@
 
         drawScratchCover();
 
+        // 칠판 밑 1~30번 자리 배치도 동적 생성
         function createSeatingChart() {
             const block1 = document.getElementById('block1');
             const block2 = document.getElementById('block2');
@@ -310,17 +229,21 @@
                 const cell = document.createElement('div');
                 cell.className = 'seat-cell';
                 cell.id = `seat-cell-${i}`;
-                cell.innerHTML = `<span>${i}</span><div class="student-name" id="name-tag-${i}"></div>`;
+                cell.innerText = i;
 
-                if (i <= 10) block1.appendChild(cell);
-                else if (i <= 20) block2.appendChild(cell);
-                else block3.appendChild(cell);
+                if (i <= 10) {
+                    block1.appendChild(cell);
+                } else if (i <= 20) {
+                    block2.appendChild(cell);
+                } else {
+                    block3.appendChild(cell);
+                }
             }
         }
 
         createSeatingChart();
 
-        // 40% 이상 긁었을 때 내 자리 표시 및 이름 표시
+        // 지운 영역 비율을 계산하여 40% 이상 지워졌을 때 내 자리 표시
         function checkScratchProgress() {
             if (isRevealed || !assignedSeat) return;
 
@@ -340,17 +263,19 @@
                 const targetCell = document.getElementById(`seat-cell-${assignedSeat}`);
                 if (targetCell) {
                     targetCell.classList.add('my-seat');
-                    const nameTag = document.getElementById(`name-tag-${assignedSeat}`);
-                    if (nameTag) nameTag.innerText = studentName;
                 }
             }
         }
 
-        // DB 기반 안전한 번호 조회 및 배정 로직
-        async function getMySeat(name) {
-            try {
-                let mySeat = null;
+        async function getMySeat() {
+            let mySeat = localStorage.getItem('my_seat_number');
+            if (mySeat) {
+                assignedSeat = mySeat;
+                seatNumberSpan.innerText = `${mySeat}번`;
+                return;
+            }
 
+            try {
                 await runTransaction(db, async (transaction) => {
                     const docRef = doc(db, 'seats', 'status');
                     const docSnap = await transaction.get(docRef);
@@ -359,81 +284,26 @@
                         throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
                     }
 
-                    let data = docSnap.data();
-                    let available = data.available || [];
-                    let assignedList = data.assigned || {};
-
-                    // 1. 이미 이 이름으로 배정된 자리가 있는지 확인 (재접속 방어)
-                    for (const [seatNum, registeredName] of Object.entries(assignedList)) {
-                        if (registeredName === name) {
-                            mySeat = seatNum;
-                            return;
-                        }
-                    }
-
-                    // 2. 등록된 적이 없다면 새로 번호 뽑기
+                    let available = docSnap.data().available;
                     if (available.length === 0) throw "모든 번호가 배정되었습니다!";
 
                     const randomIndex = Math.floor(Math.random() * available.length);
                     mySeat = available.splice(randomIndex, 1)[0];
-                    assignedList[mySeat] = name;
 
-                    transaction.update(docRef, { 
-                        available: available,
-                        assigned: assignedList
-                    });
+                    transaction.update(docRef, { available: available });
                 });
 
                 localStorage.setItem('my_seat_number', mySeat);
-                localStorage.setItem('my_student_name', name);
                 assignedSeat = mySeat;
-                studentName = name;
                 seatNumberSpan.innerText = `${mySeat}번`;
-                nameModal.style.display = 'none';
             } catch (error) {
                 alert("번호 배정 중 오류가 발생했습니다: " + error);
             }
         }
 
-        const savedName = localStorage.getItem('my_student_name');
-        if (savedName) {
-            getMySeat(savedName);
-        }
+        getMySeat();
 
-        confirmNameBtn.addEventListener('click', () => {
-            const inputVal = nameInput.value.trim();
-            if (!inputVal) {
-                alert("이름(또는 학번과 이름)을 입력해 주세요!");
-                return;
-            }
-            getMySeat(inputVal);
-        });
-
-        onSnapshot(doc(db, 'seats', 'status'), (snapshot) => {
-            if (!snapshot.exists()) return;
-            const assignedData = snapshot.data().assigned || {};
-
-            if (showAllResultMode) {
-                for (let i = 1; i <= 30; i++) {
-                    const nameTag = document.getElementById(`name-tag-${i}`);
-                    if (nameTag && assignedData[i]) {
-                        nameTag.innerText = assignedData[i];
-                    }
-                }
-            }
-        });
-
-        toggleResultBtn.addEventListener('click', () => {
-            showAllResultMode = !showAllResultMode;
-            if (showAllResultMode) {
-                toggleResultBtn.innerText = "🔍 내 자리만 보기";
-                toggleResultBtn.style.backgroundColor = "#0288d1";
-            } else {
-                toggleResultBtn.innerText = "📊 전체 결과 확인";
-                toggleResultBtn.style.backgroundColor = "#1976d2";
-            }
-        });
-
+        // 부드러운 스크래치 인터랙션
         let isDrawing = false;
         let lastPos = { x: 0, y: 0 };
 
@@ -488,21 +358,12 @@
 </head>
 <body>
 
-    <div class="modal-overlay" id="nameModal">
-        <div class="modal-box">
-            <h3>👋 반가워요!</h3>
-            <p>자리 뽑기를 시작하기 전에<br>본인의 학번과 이름을 입력해 주세요.</p>
-            <input type="text" id="studentNameInput" placeholder="예: 10101 홍길동" autofocus>
-            <button id="confirmNameBtn">입력 완료</button>
-        </div>
-    </div>
-
     <div class="header">
         <h1>🎲 11월 자리 뽑기</h1>
         <p>카드를 긁어 번호를 확인하고, 내 자리를 확인하세요!</p>
-        <button class="toggle-btn" id="toggleResultBtn">📊 전체 결과 확인</button>
     </div>
 
+    <!-- 스크래치 카드 -->
     <div class="card-container">
         <div class="seat-content">
             <div class="seat-label">MY SEAT</div>
@@ -511,6 +372,7 @@
         <canvas id="scratchPad" width="340" height="200"></canvas>
     </div>
 
+    <!-- 교실 자리 배치도 -->
     <div class="classroom-container">
         <div class="board-title">칠 판 (교탁)</div>
         <div class="seating-chart">
