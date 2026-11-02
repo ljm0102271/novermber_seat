@@ -10,31 +10,25 @@
         canvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
         .info { margin-bottom: 20px; color: #666; font-size: 1.1rem; }
     </style>
-    <!-- Firebase SDK (파이어베이스 연동 라이브러리) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-</head>
-<body>
+    
+    <!-- 최신 파이어베이스 SDK (Modular 방식) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <h2>🎲 2학기 모둠 자리 번호 뽑기</h2>
-    <p class="info">화면을 손가락으로 긁어서 내 번호를 확인하세요!</p>
+        // 본인의 파이어베이스 설정 정보
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
+            authDomain: "novemberseat.firebaseapp.com",
+            projectId: "novemberseat",
+            storageBucket: "novemberseat.firebasestorage.app",
+            messagingSenderId: "808743313177",
+            appId: "1:808743313177:web:1cc447ae25a0acd126f88",
+            measurementId: "G-6ZEZND2HB9"
+        };
 
-    <div class="card-container">
-        <span id="seat-number">--번</span>
-        <canvas id="scratchPad" width="300" height="200"></canvas>
-    </div>
-
-    <script>
-        // [설정] 본인의 파이어베이스 프로젝트 정보 입력 필요
-const firebaseConfig = {
-    apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
-    authDomain: "novemberseat.firebaseapp.com",
-    projectId: "novemberseat",
-    storageBucket: "novemberseat.firebasestorage.app",
-    messagingSenderId: "808743313177",
-    appId: "1:808743313177:web:1cc447ae25a0acd126f88",
-    measurementId: "G-6ZEZND2HB9"
-};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         const seatNumberSpan = document.getElementById('seat-number');
         const canvas = document.getElementById('scratchPad');
@@ -49,7 +43,6 @@ const firebaseConfig = {
         ctx.fillText('여기를 긁어서 번호 확인!', canvas.width / 2, canvas.height / 2 + 6);
         ctx.globalCompositeOperation = 'destination-out';
 
-        // 브라우저 저장소(LocalStorage)를 확인하여 이미 번호를 뽑은 학생인지 체크
         async function getMySeat() {
             let mySeat = localStorage.getItem('my_seat_number');
             if (mySeat) {
@@ -58,17 +51,19 @@ const firebaseConfig = {
             }
 
             try {
-                // 트랜잭션(Transaction: 동시성 제어 기술)을 이용해 1~30 중 남은 번호 하나를 안전하게 선점
-                await db.runTransaction(async (transaction) => {
-                    const docRef = db.collection('seats').doc('status');
-                    const doc = await transaction.get(docRef);
+                await runTransaction(db, async (transaction) => {
+                    const docRef = doc(db, 'seats', 'status');
+                    const docSnap = await transaction.get(docRef);
                     
-                    let available = doc.data().available; // 남은 번호 배열 [1, 2, 3, ...]
+                    if (!docSnap.exists()) {
+                        throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
+                    }
+
+                    let available = docSnap.data().available; // 남은 번호 배열
                     if (available.length === 0) throw "모든 번호가 배정되었습니다!";
 
-                    // 랜덤 인덱스 선택
                     const randomIndex = Math.floor(Math.random() * available.length);
-                    mySeat = available.splice(randomIndex, 1)[0]; // 남은 번호에서 추출
+                    mySeat = available.splice(randomIndex, 1)[0];
 
                     transaction.update(docRef, { available: available });
                 });
@@ -102,5 +97,16 @@ const firebaseConfig = {
         canvas.addEventListener('touchmove', scratch);
         window.addEventListener('touchend', () => isDrawing = false);
     </script>
+</head>
+<body>
+
+    <h2>🎲 11월 자리 뽑기</h2>
+    <p class="info">화면을 손가락으로 긁어서 내 번호를 확인하세요!</p>
+
+    <div class="card-container">
+        <span id="seat-number">--번</span>
+        <canvas id="scratchPad" width="300" height="200"></canvas>
+    </div>
+
 </body>
 </html>
