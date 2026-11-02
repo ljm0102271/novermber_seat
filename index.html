@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>두근두근 자리 뽑기</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; text-align: center; background-color: #f0f2f5; margin-top: 50px; }
+        .card-container { position: relative; width: 300px; height: 200px; margin: 20px auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #333; }
+        canvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
+        .info { margin-bottom: 20px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <h2>🎲 우리 모둠 자리 확인하기</h2>
+    <p class="info">손가락으로 카드를 긁어서 번호를 확인하세요!</p>
+
+    <div class="card-container">
+        <!-- 당첨 번호 (서버 연동 또는 로컬 난수 발생으로 변경 가능) -->
+        <span id="seat-number">15번</span>
+        <canvas id="scratchPad" width="300" height="200"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scratchPad');
+        const ctx = canvas.getContext('2d');
+
+        // 스크래치 커버 색상 (은색)
+        ctx.fillStyle = '#c0c0c0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 텍스트 안내 추가
+        ctx.fillStyle = '#666';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('여기를 긁어주세요!', canvas.width / 2, canvas.height / 2 + 7);
+
+        ctx.globalCompositeOperation = 'destination-out';
+
+        let isDrawing = false;
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mousemove', scratch);
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        canvas.addEventListener('touchmove', scratch);
+        window.addEventListener('touchend', () => isDrawing = false);
+    </script>
+</body>
+</html>
