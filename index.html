@@ -171,7 +171,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
@@ -193,7 +193,6 @@
         let assignedSeat = null;
         let isRevealed = false;
 
-        // 스크래치 커버 그리기 (연한 파란색 계열)
         function drawScratchCover() {
             const width = canvas.width;
             const height = canvas.height;
@@ -219,7 +218,6 @@
 
         drawScratchCover();
 
-        // 칠판 밑 1~30번 자리 배치도 동적 생성
         function createSeatingChart() {
             const block1 = document.getElementById('block1');
             const block2 = document.getElementById('block2');
@@ -231,19 +229,14 @@
                 cell.id = `seat-cell-${i}`;
                 cell.innerText = i;
 
-                if (i <= 10) {
-                    block1.appendChild(cell);
-                } else if (i <= 20) {
-                    block2.appendChild(cell);
-                } else {
-                    block3.appendChild(cell);
-                }
+                if (i <= 10) block1.appendChild(cell);
+                else if (i <= 20) block2.appendChild(cell);
+                else block3.appendChild(cell);
             }
         }
 
         createSeatingChart();
 
-        // 지운 영역 비율을 계산하여 40% 이상 지워졌을 때 내 자리 표시
         function checkScratchProgress() {
             if (isRevealed || !assignedSeat) return;
 
@@ -268,6 +261,7 @@
         }
 
         async function getMySeat() {
+            // 1. 내 브라우저에 이미 뽑았던 번호가 저장되어 있다면 그걸 그대로 사용 (테스트 및 새로고침 시 소진 방지)
             let mySeat = localStorage.getItem('my_seat_number');
             if (mySeat) {
                 assignedSeat = mySeat;
@@ -280,17 +274,23 @@
                     const docRef = doc(db, 'seats', 'status');
                     const docSnap = await transaction.get(docRef);
 
-                    if (!docSnap.exists()) {
-                        throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
+                    let available = [];
+                    if (!docSnap.exists() || !docSnap.data().available) {
+                        // 문서가 아예 없거나 비어있으면 1~30번 자동 생성
+                        available = Array.from({length: 30}, (_, i) => i + 1);
+                    } else {
+                        available = docSnap.data().available;
                     }
 
-                    let available = docSnap.data().available;
-                    if (available.length === 0) throw "모든 번호가 배정되었습니다!";
+                    // 만약 번호가 다 떨어졌다면 테스트를 위해 자동으로 1~30번 다시 채워줌
+                    if (available.length === 0) {
+                        available = Array.from({length: 30}, (_, i) => i + 1);
+                    }
 
                     const randomIndex = Math.floor(Math.random() * available.length);
                     mySeat = available.splice(randomIndex, 1)[0];
 
-                    transaction.update(docRef, { available: available });
+                    transaction.set(docRef, { available: available }, { merge: true });
                 });
 
                 localStorage.setItem('my_seat_number', mySeat);
@@ -303,7 +303,6 @@
 
         getMySeat();
 
-        // 부드러운 스크래치 인터랙션
         let isDrawing = false;
         let lastPos = { x: 0, y: 0 };
 
