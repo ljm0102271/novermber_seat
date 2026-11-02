@@ -3,43 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>11월 자리</title>
+    <title>두근두근 자리 뽑기</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; text-align: center; background-color: #f0f2f5; margin-top: 50px; }
-        .card-container { position: relative; width: 300px; height: 200px; margin: 20px auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #333; }
+        .card-container { position: relative; width: 300px; height: 200px; margin: 20px auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; color: #007bff; }
         canvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
-        .info { margin-bottom: 20px; color: #666; }
+        .info { margin-bottom: 20px; color: #666; font-size: 1.1rem; }
     </style>
+    <!-- Firebase SDK (파이어베이스 연동 라이브러리) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-    <h2>🎲 자리 확인하기</h2>
-    <p class="info">손가락으로 카드를 긁어서 번호를 확인하세요!</p>
+    <h2>🎲 2학기 모둠 자리 번호 뽑기</h2>
+    <p class="info">화면을 손가락으로 긁어서 내 번호를 확인하세요!</p>
 
     <div class="card-container">
-        <!-- 당첨 번호 (서버 연동 또는 로컬 난수 발생으로 변경 가능) -->
-        <span id="seat-number">15번</span>
+        <span id="seat-number">--번</span>
         <canvas id="scratchPad" width="300" height="200"></canvas>
     </div>
 
     <script>
+        // [설정] 본인의 파이어베이스 프로젝트 정보 입력 필요
+      const firebaseConfig = {
+    apiKey: "AIzaSyAWqx6z0NWrMBBZ7F1patX7BfejmNV4RGQ",
+    authDomain: "novemberseat.firebaseapp.com",
+    projectId: "novemberseat",
+    storageBucket: "novemberseat.firebasestorage.app",
+    messagingSenderId: "808743313177",
+    appId: "1:808743313177:web:1cc447ae25a00acd126f88",
+    measurementId: "G-6ZEZND2HB9"
+  };
+
+        const seatNumberSpan = document.getElementById('seat-number');
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
 
-        // 스크래치 커버 색상 (은색)
+        // 스크래치 커버 그리기 (은색)
         ctx.fillStyle = '#c0c0c0';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 텍스트 안내 추가
-        ctx.fillStyle = '#666';
-        ctx.font = '20px sans-serif';
+        ctx.fillStyle = '#555';
+        ctx.font = '18px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('여기를 긁어주세요!', canvas.width / 2, canvas.height / 2 + 7);
-
+        ctx.fillText('여기를 긁어서 번호 확인!', canvas.width / 2, canvas.height / 2 + 6);
         ctx.globalCompositeOperation = 'destination-out';
 
-        let isDrawing = false;
+        // 브라우저 저장소(LocalStorage)를 확인하여 이미 번호를 뽑은 학생인지 체크
+        async function getMySeat() {
+            let mySeat = localStorage.getItem('my_seat_number');
+            if (mySeat) {
+                seatNumberSpan.innerText = `${mySeat}번`;
+                return;
+            }
 
+            try {
+                // 트랜잭션(Transaction: 동시성 제어 기술)을 이용해 1~30 중 남은 번호 하나를 안전하게 선점
+                await db.runTransaction(async (transaction) => {
+                    const docRef = db.collection('seats').doc('status');
+                    const doc = await transaction.get(docRef);
+                    
+                    let available = doc.data().available; // 남은 번호 배열 [1, 2, 3, ...]
+                    if (available.length === 0) throw "모든 번호가 배정되었습니다!";
+
+                    // 랜덤 인덱스 선택
+                    const randomIndex = Math.floor(Math.random() * available.length);
+                    mySeat = available.splice(randomIndex, 1)[0]; // 남은 번호에서 추출
+
+                    transaction.update(docRef, { available: available });
+                });
+
+                localStorage.setItem('my_seat_number', mySeat);
+                seatNumberSpan.innerText = `${mySeat}번`;
+            } catch (error) {
+                alert("번호 배정 중 오류가 발생했습니다: " + error);
+            }
+        }
+
+        getMySeat();
+
+        // 스크래치 인터랙션 구현
+        let isDrawing = false;
         function scratch(e) {
             if (!isDrawing) return;
             const rect = canvas.getBoundingClientRect();
@@ -47,14 +91,13 @@
             const y = (e.clientY || e.touches[0].clientY) - rect.top;
 
             ctx.beginPath();
-            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
             ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => isDrawing = true);
         canvas.addEventListener('mousemove', scratch);
         window.addEventListener('mouseup', () => isDrawing = false);
-
         canvas.addEventListener('touchstart', () => isDrawing = true);
         canvas.addEventListener('touchmove', scratch);
         window.addEventListener('touchend', () => isDrawing = false);
