@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎲 11월 자리 뽑기</title>
     <style>
+        /* 페이퍼로지 (Paperlogy) 웹폰트 정의 */
+        @font-face {
+            font-family: 'Paperlogy-5Medium';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/Paperlogy-5Medium.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
         * { box-sizing: border-box; }
         body {
             font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -24,7 +32,8 @@
             margin-bottom: 20px;
         }
         .header h1 {
-            font-size: 2rem;
+            font-family: 'Paperlogy-5Medium', sans-serif; /* 페이퍼로지 폰트 적용 */
+            font-size: 2.2rem;
             color: #2c3e50;
             margin: 0 0 8px 0;
             letter-spacing: -1px;
@@ -181,6 +190,9 @@
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
 
+        let assignedSeat = null;
+        let isRevealed = false;
+
         // 스크래치 커버 그리기
         function drawScratchCover() {
             const width = canvas.width;
@@ -231,19 +243,35 @@
 
         createSeatingChart();
 
-        // 번호 배정 후 배치도 상 내 자리 하이라이트 함수
-        function highlightSeat(seatNum) {
-            seatNumberSpan.innerText = `${seatNum}번`;
-            const targetCell = document.getElementById(`seat-cell-${seatNum}`);
-            if (targetCell) {
-                targetCell.classList.add('my-seat');
+        // 지운 영역 비율을 계산하여 배치도 표에 표시 (40% 지웠을 때만)
+        function checkScratchProgress() {
+            if (isRevealed || !assignedSeat) return;
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparentPixels = 0;
+
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] === 0) transparentPixels++;
+            }
+
+            const totalPixels = canvas.width * canvas.height;
+            const scratchedRatio = transparentPixels / totalPixels;
+
+            if (scratchedRatio > 0.4) {
+                isRevealed = true;
+                const targetCell = document.getElementById(`seat-cell-${assignedSeat}`);
+                if (targetCell) {
+                    targetCell.classList.add('my-seat');
+                }
             }
         }
 
         async function getMySeat() {
             let mySeat = localStorage.getItem('my_seat_number');
             if (mySeat) {
-                highlightSeat(mySeat);
+                assignedSeat = mySeat;
+                seatNumberSpan.innerText = `${mySeat}번`;
                 return;
             }
 
@@ -251,7 +279,7 @@
                 await runTransaction(db, async (transaction) => {
                     const docRef = doc(db, 'seats', 'status');
                     const docSnap = await transaction.get(docRef);
-                    
+
                     if (!docSnap.exists()) {
                         throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
                     }
@@ -266,7 +294,8 @@
                 });
 
                 localStorage.setItem('my_seat_number', mySeat);
-                highlightSeat(mySeat);
+                assignedSeat = mySeat;
+                seatNumberSpan.innerText = `${mySeat}번`;
             } catch (error) {
                 alert("번호 배정 중 오류가 발생했습니다: " + error);
             }
@@ -311,6 +340,7 @@
             ctx.stroke();
 
             lastPos = currentPos;
+            checkScratchProgress();
         }
 
         function stopScratch() {
@@ -352,7 +382,5 @@
         </div>
     </div>
 
-</body>
-</html>
 </body>
 </html>
