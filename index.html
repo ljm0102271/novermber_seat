@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎲 11월 자리 뽑기</title>
     <style>
-        /* 페이퍼로지 (Paperlogy) 웹폰트 정의 */
         @font-face {
             font-family: 'Paperlogy-5Medium';
             src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/Paperlogy-5Medium.woff2') format('woff2');
@@ -19,7 +18,7 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             margin: 0;
-            padding: 30px 15px;
+            padding: 20px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,10 +28,13 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            width: 100%;
+            max-width: 650px;
         }
         .header h1 {
-            font-family: 'Paperlogy-5Medium', sans-serif; /* 페이퍼로지 폰트 적용 */
+            font-family: 'Paperlogy-5Medium', sans-serif;
             font-size: 2.2rem;
             color: #2c3e50;
             margin: 0 0 8px 0;
@@ -41,8 +43,23 @@
         .header p {
             font-size: 1rem;
             color: #606f7b;
-            margin: 0;
+            margin: 0 0 10px 0;
         }
+
+        /* 결과 확인 탭 버튼 */
+        .toggle-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s ease;
+        }
+        .toggle-btn:hover { background-color: #4338ca; transform: translateY(-1px); }
 
         /* 카드 상자 */
         .card-container {
@@ -57,7 +74,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .seat-content {
@@ -111,20 +128,18 @@
             font-weight: bold;
             padding: 8px 0;
             border-radius: 6px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 0.95rem;
             letter-spacing: 2px;
         }
 
-        /* 3개 분단 배치 */
         .seating-chart {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
             width: 100%;
         }
 
-        /* 분단 개별 스타일 (2열 5행) */
         .block {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -133,28 +148,41 @@
             background: #333;
             gap: 2px;
             flex: 1;
-            max-width: 170px;
+            max-width: 180px;
         }
 
         .seat-cell {
             background: #ffffff;
-            height: 52px;
+            height: 55px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             color: #333333;
             transition: all 0.3s ease;
+            padding: 2px;
         }
 
-        /* 내 자리 하이라이트 애니메이션 */
+        .seat-cell .student-name {
+            font-size: 0.75rem;
+            color: #4f46e5;
+            font-weight: 700;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
         .seat-cell.my-seat {
             background-color: #4f46e5 !important;
             color: #ffffff !important;
-            font-size: 1.4rem;
-            font-weight: 800;
             animation: pulse 1.5s infinite alternate;
+        }
+        .seat-cell.my-seat .student-name {
+            color: #ffffff !important;
         }
 
         @keyframes pulse {
@@ -162,16 +190,61 @@
             100% { transform: scale(0.95); box-shadow: inset 0 0 0 4px #a5b4fc; }
         }
 
+        /* 이름 입력 팝업 모달 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .modal-box h3 { margin: 0 0 10px 0; color: #1e293b; font-size: 1.3rem; }
+        .modal-box p { margin: 0 0 20px 0; color: #64748b; font-size: 0.9rem; }
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+        }
+        .modal-box input:focus { border-color: #4f46e5; }
+        .modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         @media (max-width: 500px) {
-            .seating-chart { gap: 8px; }
-            .seat-cell { height: 42px; font-size: 0.95rem; }
+            .seating-chart { gap: 6px; }
+            .seat-cell { height: 48px; font-size: 0.9rem; }
+            .seat-cell .student-name { font-size: 0.68rem; }
         }
     </style>
 
-    <!-- 최신 파이어베이스 SDK (Modular 방식) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAWqx6z0NWrmBBZ7F1patX7BfejmNV4RGQ",
@@ -189,9 +262,15 @@
         const seatNumberSpan = document.getElementById('seat-number');
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
+        const nameModal = document.getElementById('nameModal');
+        const nameInput = document.getElementById('studentNameInput');
+        const confirmNameBtn = document.getElementById('confirmNameBtn');
+        const toggleResultBtn = document.getElementById('toggleResultBtn');
 
         let assignedSeat = null;
+        let studentName = "";
         let isRevealed = false;
+        let showAllResultMode = false;
 
         // 스크래치 커버 그리기
         function drawScratchCover() {
@@ -219,7 +298,6 @@
 
         drawScratchCover();
 
-        // 칠판 밑 1~30번 자리 배치도 동적 생성
         function createSeatingChart() {
             const block1 = document.getElementById('block1');
             const block2 = document.getElementById('block2');
@@ -229,21 +307,17 @@
                 const cell = document.createElement('div');
                 cell.className = 'seat-cell';
                 cell.id = `seat-cell-${i}`;
-                cell.innerText = i;
+                cell.innerHTML = `<span>${i}</span><div class="student-name" id="name-tag-${i}"></div>`;
 
-                if (i <= 10) {
-                    block1.appendChild(cell);
-                } else if (i <= 20) {
-                    block2.appendChild(cell);
-                } else {
-                    block3.appendChild(cell);
-                }
+                if (i <= 10) block1.appendChild(cell);
+                else if (i <= 20) block2.appendChild(cell);
+                else block3.appendChild(cell);
             }
         }
 
         createSeatingChart();
 
-        // 지운 영역 비율을 계산하여 배치도 표에 표시 (40% 지웠을 때만)
+        // 40% 지웠을 때 내 자리 표시
         function checkScratchProgress() {
             if (isRevealed || !assignedSeat) return;
 
@@ -263,15 +337,20 @@
                 const targetCell = document.getElementById(`seat-cell-${assignedSeat}`);
                 if (targetCell) {
                     targetCell.classList.add('my-seat');
+                    const nameTag = document.getElementById(`name-tag-${assignedSeat}`);
+                    if (nameTag) nameTag.innerText = studentName;
                 }
             }
         }
 
-        async function getMySeat() {
+        // 파이어베이스에서 번호 및 학생 이름 할당
+        async function getMySeat(name) {
             let mySeat = localStorage.getItem('my_seat_number');
             if (mySeat) {
                 assignedSeat = mySeat;
+                studentName = localStorage.getItem('my_student_name') || name;
                 seatNumberSpan.innerText = `${mySeat}번`;
+                nameModal.style.display = 'none';
                 return;
             }
 
@@ -284,24 +363,74 @@
                         throw "Firestore에 'seats/status' 문서가 존재하지 않습니다!";
                     }
 
-                    let available = docSnap.data().available;
+                    let data = docSnap.data();
+                    let available = data.available || [];
+                    let assignedList = data.assigned || {};
+
                     if (available.length === 0) throw "모든 번호가 배정되었습니다!";
 
                     const randomIndex = Math.floor(Math.random() * available.length);
                     mySeat = available.splice(randomIndex, 1)[0];
+                    assignedList[mySeat] = name;
 
-                    transaction.update(docRef, { available: available });
+                    transaction.update(docRef, { 
+                        available: available,
+                        assigned: assignedList
+                    });
                 });
 
                 localStorage.setItem('my_seat_number', mySeat);
+                localStorage.setItem('my_student_name', name);
                 assignedSeat = mySeat;
+                studentName = name;
                 seatNumberSpan.innerText = `${mySeat}번`;
+                nameModal.style.display = 'none';
             } catch (error) {
                 alert("번호 배정 중 오류가 발생했습니다: " + error);
             }
         }
 
-        getMySeat();
+        // 이름 입력 팝업 제어 및 기존 로그인 확인
+        const savedName = localStorage.getItem('my_student_name');
+        if (savedName) {
+            getMySeat(savedName);
+        }
+
+        confirmNameBtn.addEventListener('click', () => {
+            const inputVal = nameInput.value.trim();
+            if (!inputVal) {
+                alert("이름(또는 학번과 이름)을 입력해 주세요!");
+                return;
+            }
+            getMySeat(inputVal);
+        });
+
+        // 실시간 전체 결과 관찰 및 '결과 확인' 탭 처리
+        onSnapshot(doc(db, 'seats', 'status'), (snapshot) => {
+            if (!snapshot.exists()) return;
+            const assignedData = snapshot.data().assigned || {};
+
+            // 결과 확인 모드일 때는 전체 학생의 이름을 표시
+            if (showAllResultMode) {
+                for (let i = 1; i <= 30; i++) {
+                    const nameTag = document.getElementById(`name-tag-${i}`);
+                    if (nameTag && assignedData[i]) {
+                        nameTag.innerText = assignedData[i];
+                    }
+                }
+            }
+        });
+
+        toggleResultBtn.addEventListener('click', () => {
+            showAllResultMode = !showAllResultMode;
+            if (showAllResultMode) {
+                toggleResultBtn.innerText = "🔍 내 자리만 보기";
+                toggleResultBtn.style.backgroundColor = "#22c55e";
+            } else {
+                toggleResultBtn.innerText = "📊 전체 결과 확인";
+                toggleResultBtn.style.backgroundColor = "#4f46e5";
+            }
+        });
 
         // 부드러운 스크래치 인터랙션
         let isDrawing = false;
@@ -358,12 +487,22 @@
 </head>
 <body>
 
-    <div class="header">
-        <h1>🎲 11월 자리 뽑기</h1>
-        <p>긁어보면 여러분의 자리가 나올 겁니다 흐흐흐</p>
+    <!-- 이름 입력 팝업 -->
+    <div class="modal-overlay" id="nameModal">
+        <div class="modal-box">
+            <h3>👋 반가워요!</h3>
+            <p>자리 뽑기를 시작하기 전에<br>본인의 학번과 이름을 입력해 주세요.</p>
+            <input type="text" id="studentNameInput" placeholder="예: 10101 홍길동" autofocus>
+            <button id="confirmNameBtn">입력 완료</button>
+        </div>
     </div>
 
-    <!-- 스크래치 카드 -->
+    <div class="header">
+        <h1>🎲 11월 자리 뽑기</h1>
+        <p>카드를 긁어 번호를 확인하고, 내 자리를 확인하세요!</p>
+        <button class="toggle-btn" id="toggleResultBtn">📊 전체 결과 확인</button>
+    </div>
+
     <div class="card-container">
         <div class="seat-content">
             <div class="seat-label">MY SEAT</div>
@@ -372,7 +511,6 @@
         <canvas id="scratchPad" width="340" height="200"></canvas>
     </div>
 
-    <!-- 교실 자리 배치도 -->
     <div class="classroom-container">
         <div class="board-title">칠 판 (교탁)</div>
         <div class="seating-chart">
