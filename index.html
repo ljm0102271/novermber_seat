@@ -320,6 +320,7 @@
 
         createSeatingChart();
 
+        // 40% 이상 긁었을 때 내 자리 표시 및 이름 표시
         function checkScratchProgress() {
             if (isRevealed || !assignedSeat) return;
 
@@ -345,7 +346,7 @@
             }
         }
 
-        // DB 기반 안전한 번호 조회 및 배정 로직 (시크릿 모드/재접속 완벽 대응)
+        // DB 기반 안전한 번호 조회 및 배정 로직
         async function getMySeat(name) {
             try {
                 let mySeat = null;
@@ -362,7 +363,7 @@
                     let available = data.available || [];
                     let assignedList = data.assigned || {};
 
-                    // 1. 이미 이 이름으로 배정된 자리가 있는지 확인 (재접속/새로고침 방어)
+                    // 1. 이미 이 이름으로 배정된 자리가 있는지 확인 (재접속 방어)
                     for (const [seatNum, registeredName] of Object.entries(assignedList)) {
                         if (registeredName === name) {
                             mySeat = seatNum;
@@ -394,7 +395,6 @@
             }
         }
 
-        // 자동 로그인 체크 (로컬 스토리지에 있으면 바로 통과)
         const savedName = localStorage.getItem('my_student_name');
         if (savedName) {
             getMySeat(savedName);
