@@ -15,7 +15,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             min-height: 100vh;
             margin: 0;
             padding: 20px 15px;
@@ -36,19 +36,19 @@
         .header h1 {
             font-family: 'Paperlogy-5Medium', sans-serif;
             font-size: 2.2rem;
-            color: #2c3e50;
+            color: #1565c0;
             margin: 0 0 8px 0;
             letter-spacing: -1px;
         }
         .header p {
             font-size: 1rem;
-            color: #606f7b;
+            color: #37474f;
             margin: 0 0 10px 0;
         }
 
         /* 결과 확인 탭 버튼 */
         .toggle-btn {
-            background-color: #4f46e5;
+            background-color: #1976d2;
             color: white;
             border: none;
             padding: 8px 18px;
@@ -56,10 +56,10 @@
             font-size: 0.95rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
             transition: all 0.2s ease;
         }
-        .toggle-btn:hover { background-color: #4338ca; transform: translateY(-1px); }
+        .toggle-btn:hover { background-color: #1565c0; transform: translateY(-1px); }
 
         /* 카드 상자 */
         .card-container {
@@ -67,7 +67,7 @@
             width: 340px;
             height: 200px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 35px rgba(21, 101, 192, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
             background: #ffffff;
             overflow: hidden;
             display: flex;
@@ -75,6 +75,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 25px;
+            border: 2px solid #bbdefb;
         }
 
         .seat-content {
@@ -85,16 +86,16 @@
         }
         .seat-label {
             font-size: 0.9rem;
-            color: #8898aa;
+            color: #90a4ae;
             margin-bottom: 3px;
             font-weight: 600;
         }
         .seat-number {
             font-size: 3.2rem;
             font-weight: 800;
-            color: #4f46e5;
+            color: #1976d2;
             letter-spacing: -2px;
-            text-shadow: 0 2px 10px rgba(79, 70, 229, 0.2);
+            text-shadow: 0 2px 10px rgba(25, 118, 210, 0.2);
         }
 
         canvas {
@@ -112,19 +113,20 @@
             background: #ffffff;
             padding: 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(21, 101, 192, 0.08);
             width: 100%;
             max-width: 650px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            border: 2px solid #bbdefb;
         }
 
         .board-title {
             width: 60%;
             text-align: center;
-            background: #e2e8f0;
-            color: #475569;
+            background: #e3f2fd;
+            color: #1565c0;
             font-weight: bold;
             padding: 8px 0;
             border-radius: 6px;
@@ -144,8 +146,8 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            border: 2px solid #333;
-            background: #333;
+            border: 2px solid #90caf9;
+            background: #90caf9;
             gap: 2px;
             flex: 1;
             max-width: 180px;
@@ -160,14 +162,14 @@
             justify-content: center;
             font-size: 1.05rem;
             font-weight: 600;
-            color: #333333;
+            color: #37474f;
             transition: all 0.3s ease;
             padding: 2px;
         }
 
         .seat-cell .student-name {
             font-size: 0.75rem;
-            color: #4f46e5;
+            color: #1976d2;
             font-weight: 700;
             margin-top: 2px;
             white-space: nowrap;
@@ -177,7 +179,7 @@
         }
 
         .seat-cell.my-seat {
-            background-color: #4f46e5 !important;
+            background-color: #1976d2 !important;
             color: #ffffff !important;
             animation: pulse 1.5s infinite alternate;
         }
@@ -187,14 +189,14 @@
 
         @keyframes pulse {
             0% { transform: scale(1); box-shadow: inset 0 0 0 2px #ffffff; }
-            100% { transform: scale(0.95); box-shadow: inset 0 0 0 4px #a5b4fc; }
+            100% { transform: scale(0.95); box-shadow: inset 0 0 0 4px #90caf9; }
         }
 
         /* 이름 입력 팝업 모달 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
@@ -208,25 +210,26 @@
             width: 90%;
             max-width: 350px;
             text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(21, 101, 192, 0.15);
+            border: 2px solid #bbdefb;
         }
-        .modal-box h3 { margin: 0 0 10px 0; color: #1e293b; font-size: 1.3rem; }
-        .modal-box p { margin: 0 0 20px 0; color: #64748b; font-size: 0.9rem; }
+        .modal-box h3 { margin: 0 0 10px 0; color: #1565c0; font-size: 1.3rem; }
+        .modal-box p { margin: 0 0 20px 0; color: #546e7a; font-size: 0.9rem; }
         .modal-box input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #cbd5e1;
+            border: 2px solid #90caf9;
             border-radius: 10px;
             font-size: 1rem;
             text-align: center;
             outline: none;
             margin-bottom: 20px;
         }
-        .modal-box input:focus { border-color: #4f46e5; }
+        .modal-box input:focus { border-color: #1976d2; }
         .modal-box button {
             width: 100%;
             padding: 12px;
-            background: #4f46e5;
+            background: #1976d2;
             color: white;
             border: none;
             border-radius: 10px;
@@ -234,6 +237,7 @@
             font-weight: bold;
             cursor: pointer;
         }
+        .modal-box button:hover { background: #1565c0; }
 
         @media (max-width: 500px) {
             .seating-chart { gap: 6px; }
@@ -272,24 +276,23 @@
         let isRevealed = false;
         let showAllResultMode = false;
 
-        // 스크래치 커버 그리기
         function drawScratchCover() {
             const width = canvas.width;
             const height = canvas.height;
 
             const gradient = ctx.createLinearGradient(0, 0, width, height);
-            gradient.addColorStop(0, '#e0e0e0');
-            gradient.addColorStop(0.5, '#b8b8b8');
-            gradient.addColorStop(1, '#9e9e9e');
+            gradient.addColorStop(0, '#e3f2fd');
+            gradient.addColorStop(0.5, '#bbdefb');
+            gradient.addColorStop(1, '#90caf9');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
             for (let i = 0; i < 500; i++) {
-                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.3)' : 'rgba(21,101,192,0.08)';
                 ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
             }
 
-            ctx.fillStyle = '#424242';
+            ctx.fillStyle = '#1565c0';
             ctx.font = 'bold 18px Pretendard, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -317,7 +320,6 @@
 
         createSeatingChart();
 
-        // 40% 지웠을 때 내 자리 표시
         function checkScratchProgress() {
             if (isRevealed || !assignedSeat) return;
 
@@ -343,18 +345,11 @@
             }
         }
 
-        // 파이어베이스에서 번호 및 학생 이름 할당
+        // DB 기반 안전한 번호 조회 및 배정 로직 (시크릿 모드/재접속 완벽 대응)
         async function getMySeat(name) {
-            let mySeat = localStorage.getItem('my_seat_number');
-            if (mySeat) {
-                assignedSeat = mySeat;
-                studentName = localStorage.getItem('my_student_name') || name;
-                seatNumberSpan.innerText = `${mySeat}번`;
-                nameModal.style.display = 'none';
-                return;
-            }
-
             try {
+                let mySeat = null;
+
                 await runTransaction(db, async (transaction) => {
                     const docRef = doc(db, 'seats', 'status');
                     const docSnap = await transaction.get(docRef);
@@ -367,6 +362,15 @@
                     let available = data.available || [];
                     let assignedList = data.assigned || {};
 
+                    // 1. 이미 이 이름으로 배정된 자리가 있는지 확인 (재접속/새로고침 방어)
+                    for (const [seatNum, registeredName] of Object.entries(assignedList)) {
+                        if (registeredName === name) {
+                            mySeat = seatNum;
+                            return;
+                        }
+                    }
+
+                    // 2. 등록된 적이 없다면 새로 번호 뽑기
                     if (available.length === 0) throw "모든 번호가 배정되었습니다!";
 
                     const randomIndex = Math.floor(Math.random() * available.length);
@@ -390,7 +394,7 @@
             }
         }
 
-        // 이름 입력 팝업 제어 및 기존 로그인 확인
+        // 자동 로그인 체크 (로컬 스토리지에 있으면 바로 통과)
         const savedName = localStorage.getItem('my_student_name');
         if (savedName) {
             getMySeat(savedName);
@@ -405,12 +409,10 @@
             getMySeat(inputVal);
         });
 
-        // 실시간 전체 결과 관찰 및 '결과 확인' 탭 처리
         onSnapshot(doc(db, 'seats', 'status'), (snapshot) => {
             if (!snapshot.exists()) return;
             const assignedData = snapshot.data().assigned || {};
 
-            // 결과 확인 모드일 때는 전체 학생의 이름을 표시
             if (showAllResultMode) {
                 for (let i = 1; i <= 30; i++) {
                     const nameTag = document.getElementById(`name-tag-${i}`);
@@ -425,14 +427,13 @@
             showAllResultMode = !showAllResultMode;
             if (showAllResultMode) {
                 toggleResultBtn.innerText = "🔍 내 자리만 보기";
-                toggleResultBtn.style.backgroundColor = "#22c55e";
+                toggleResultBtn.style.backgroundColor = "#0288d1";
             } else {
                 toggleResultBtn.innerText = "📊 전체 결과 확인";
-                toggleResultBtn.style.backgroundColor = "#4f46e5";
+                toggleResultBtn.style.backgroundColor = "#1976d2";
             }
         });
 
-        // 부드러운 스크래치 인터랙션
         let isDrawing = false;
         let lastPos = { x: 0, y: 0 };
 
@@ -487,7 +488,6 @@
 </head>
 <body>
 
-    <!-- 이름 입력 팝업 -->
     <div class="modal-overlay" id="nameModal">
         <div class="modal-box">
             <h3>👋 반가워요!</h3>
