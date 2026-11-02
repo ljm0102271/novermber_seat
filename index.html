@@ -11,34 +11,35 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             margin: 0;
+            padding: 30px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             user-select: none;
             -webkit-user-select: none;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: #2c3e50;
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             letter-spacing: -1px;
         }
         .header p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #606f7b;
             margin: 0;
         }
 
+        /* 카드 상자 */
         .card-container {
             position: relative;
-            width: 360px;
-            height: 220px;
+            width: 340px;
+            height: 200px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(50, 50, 93, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
             background: #ffffff;
@@ -47,9 +48,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            margin-bottom: 30px;
         }
 
-        /* 내부에 위치한 당첨 번호 레이아웃 */
         .seat-content {
             display: flex;
             flex-direction: column;
@@ -57,13 +58,13 @@
             justify-content: center;
         }
         .seat-label {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #8898aa;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             font-weight: 600;
         }
         .seat-number {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 800;
             color: #4f46e5;
             letter-spacing: -2px;
@@ -77,10 +78,87 @@
             width: 100%;
             height: 100%;
             cursor: pointer;
-            touch-action: none; /* 태블릿 스크롤 방지 */
+            touch-action: none;
+        }
+
+        /* 교실 자리 배치도 영역 */
+        .classroom-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .board-title {
+            width: 60%;
+            text-align: center;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: bold;
+            padding: 8px 0;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+        }
+
+        /* 3개 분단 배치 */
+        .seating-chart {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* 분단 개별 스타일 (2열 5행) */
+        .block {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            border: 2px solid #333;
+            background: #333;
+            gap: 2px;
+            flex: 1;
+            max-width: 170px;
+        }
+
+        .seat-cell {
+            background: #ffffff;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333333;
+            transition: all 0.3s ease;
+        }
+
+        /* 내 자리 하이라이트 애니메이션 */
+        .seat-cell.my-seat {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            font-size: 1.4rem;
+            font-weight: 800;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: inset 0 0 0 2px #ffffff; }
+            100% { transform: scale(0.95); box-shadow: inset 0 0 0 4px #a5b4fc; }
+        }
+
+        @media (max-width: 500px) {
+            .seating-chart { gap: 8px; }
+            .seat-cell { height: 42px; font-size: 0.95rem; }
         }
     </style>
-    
+
     <!-- 최신 파이어베이스 SDK (Modular 방식) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -103,12 +181,11 @@
         const canvas = document.getElementById('scratchPad');
         const ctx = canvas.getContext('2d');
 
-        // 스크래치 커버 디자인 (입체적인 은색 그래디언트 + 안내 문구)
+        // 스크래치 커버 그리기
         function drawScratchCover() {
             const width = canvas.width;
             const height = canvas.height;
 
-            // 배경 은색 그래디언트
             const gradient = ctx.createLinearGradient(0, 0, width, height);
             gradient.addColorStop(0, '#e0e0e0');
             gradient.addColorStop(0.5, '#b8b8b8');
@@ -116,15 +193,13 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
-            // 섬세한 노이즈 텍스처 효과 추가
             for (let i = 0; i < 500; i++) {
                 ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
                 ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
             }
 
-            // 안내 문구 설정
             ctx.fillStyle = '#424242';
-            ctx.font = 'bold 20px Pretendard, sans-serif';
+            ctx.font = 'bold 18px Pretendard, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('✨ 손으로 긁어보세요 ✨', width / 2, height / 2);
@@ -132,10 +207,43 @@
 
         drawScratchCover();
 
+        // 칠판 밑 1~30번 자리 배치도 동적 생성
+        function createSeatingChart() {
+            const block1 = document.getElementById('block1');
+            const block2 = document.getElementById('block2');
+            const block3 = document.getElementById('block3');
+
+            for (let i = 1; i <= 30; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'seat-cell';
+                cell.id = `seat-cell-${i}`;
+                cell.innerText = i;
+
+                if (i <= 10) {
+                    block1.appendChild(cell);
+                } else if (i <= 20) {
+                    block2.appendChild(cell);
+                } else {
+                    block3.appendChild(cell);
+                }
+            }
+        }
+
+        createSeatingChart();
+
+        // 번호 배정 후 배치도 상 내 자리 하이라이트 함수
+        function highlightSeat(seatNum) {
+            seatNumberSpan.innerText = `${seatNum}번`;
+            const targetCell = document.getElementById(`seat-cell-${seatNum}`);
+            if (targetCell) {
+                targetCell.classList.add('my-seat');
+            }
+        }
+
         async function getMySeat() {
             let mySeat = localStorage.getItem('my_seat_number');
             if (mySeat) {
-                seatNumberSpan.innerText = `${mySeat}번`;
+                highlightSeat(mySeat);
                 return;
             }
 
@@ -158,7 +266,7 @@
                 });
 
                 localStorage.setItem('my_seat_number', mySeat);
-                seatNumberSpan.innerText = `${mySeat}번`;
+                highlightSeat(mySeat);
             } catch (error) {
                 alert("번호 배정 중 오류가 발생했습니다: " + error);
             }
@@ -166,7 +274,7 @@
 
         getMySeat();
 
-        // 부드러운 스크래치 인터랙션 (태블릿 터치 및 마우스 대응)
+        // 부드러운 스크래치 인터랙션
         let isDrawing = false;
         let lastPos = { x: 0, y: 0 };
 
@@ -193,9 +301,9 @@
             const currentPos = getPos(e);
 
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.lineWidth = 45; // 지우개 크기 (태블릿에 적합한 두께)
-            ctx.lineCap = 'round'; // 붓 끝을 둥글게하여 끊김 완화
-            ctx.lineJoin = 'round'; // 선 연결부를 둥글게
+            ctx.lineWidth = 45;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
             ctx.beginPath();
             ctx.moveTo(lastPos.x, lastPos.y);
@@ -209,7 +317,6 @@
             isDrawing = false;
         }
 
-        // 터치 및 마우스 이벤트 리스너
         canvas.addEventListener('mousedown', startScratch);
         canvas.addEventListener('mousemove', scratch);
         window.addEventListener('mouseup', stopScratch);
@@ -223,15 +330,26 @@
 
     <div class="header">
         <h1>🎲 2학기 모둠 자리 뽑기</h1>
-        <p>카드를 문질러서 지정 자리를 확인하세요!</p>
+        <p>카드를 긁어 번호를 확인하고, 내 자리를 확인하세요!</p>
     </div>
 
+    <!-- 스크래치 카드 -->
     <div class="card-container">
         <div class="seat-content">
             <div class="seat-label">MY SEAT</div>
             <div class="seat-number" id="seat-number">--번</div>
         </div>
-        <canvas id="scratchPad" width="360" height="220"></canvas>
+        <canvas id="scratchPad" width="340" height="200"></canvas>
+    </div>
+
+    <!-- 교실 자리 배치도 -->
+    <div class="classroom-container">
+        <div class="board-title">칠 판 (교탁)</div>
+        <div class="seating-chart">
+            <div class="block" id="block1"></div>
+            <div class="block" id="block2"></div>
+            <div class="block" id="block3"></div>
+        </div>
     </div>
 
 </body>
